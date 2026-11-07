@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogicLingo Web - Modelagem e Simulação Matemática</title>
+    <style>
+        :root {
+            --green: #58cc02;
+            --green-dark: #46a302;
+            --blue: #1cb0f6;
+            --blue-dark: #1899d6;
+            --red: #ff4b4b;
+            --red-dark: #ea2b2b;
+            --yellow: #ffc800;
+            --purple: #ce82ff;
+            --purple-dark: #a552db;
+            --orange: #ff9600;
+            --orange-dark: #cc7800;
+            --bg-light: #f7f9fa;
+            --border-color: #e5e5e5;
+            --text-dark: #3c3c3c;
+            --text-muted: #777777;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* BARRA LATERAL ESQUERDA (SIDEBAR) */
+        .sidebar {
+            width: 260px;
+            background: #ffffff;
+            border-right: 2px solid var(--border-color);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: var(--green);
+            margin-bottom: 36px;
+            padding-left: 12px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: left;
+            text-transform: uppercase;
+            transition: all 0.15s;
+        }
+
+        .nav-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .nav-item.active {
+            background-color: #ddf4ff;
+            border-color: #84d8ff;
+            color: var(--blue-dark);
+        }
+
+        .sidebar-footer {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            border-top: 2px solid var(--border-color);
+            padding-top: 16px;
+            line-height: 1.5;
+        }
+
+        /* ESTRUTURA PRINCIPAL DESKTOP */
+        .desktop-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 32px;
+            max-width: 1380px;
+            padding: 36px 42px;
+            width: 100%;
+        }
+
+        /* COLUNA CENTRAL */
+        .center-column {
+            min-width: 0;
+        }
+
+        .page-header {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            font-size: 1.55rem;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* GRADE DE UNIDADES (TRILHA DESKTOP) */
+        .units-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .unit-card {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-bottom-width: 6px;
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .unit-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .unit-tag {
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: #ffffff;
+        }
+
+        .unit-status {
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .unit-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .unit-card p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        /* BOTÕES 3D */
+        .btn-3d {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .btn-3d:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .btn-green { background: var(--green); border-bottom: 4px solid var(--green-dark); }
+        .btn-blue { background: var(--blue); border-bottom: 4px solid var(--blue-dark); }
+        .btn-purple { background: var(--purple); border-bottom: 4px solid var(--purple-dark); }
+        .btn-orange { background: var(--orange); border-bottom: 4px solid var(--orange-dark); }
+
+        /* SEÇÃO DO GUIA TEÓRICO EM GRADE */
+        .theory-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .theory-card {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .theory-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .theory-card h3 {
+            color: var(--blue-dark);
+            font-size: 1.18rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .theory-card p, .theory-card li {
+            font-size: 0.94rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .theory-card ul {
+            padding-left: 20px;
+        }
+
+        .code-pill {
+            background: #eef9ff;
+            color: #0b6fa4;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .truth-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .truth-table th, .truth-table td {
+            border: 1px solid #dcdcdc;
+            padding: 10px;
+        }
+
+        .truth-table th {
+            background: #eef9ff;
+            color: var(--text-dark);
+            font-weight: 800;
+        }
+
+        /* COLUNA LATERAL DIREITA (WIDGETS DESKTOP) */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .stats-bar {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-around;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .widget-box {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 22px;
+        }
+
+        .widget-box h4 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            color: var(--text-dark);
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .cheat-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 0.88rem;
+        }
+
+        .cheat-list li {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        /* MODO DE LIÇÃO / QUIZ EM TELA CHEIA DESKTOP */
+        .quiz-modal {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+        }
+
+        .quiz-modal.active {
+            display: flex;
+        }
+
+        .quiz-top {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 28px 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 16px;
+            background: var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--green);
+            transition: width 0.3s ease;
+        }
+
+        .quiz-center {
+            flex: 1;
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-badge {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--blue-dark);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .quiz-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 32px;
+            line-height: 1.35;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .option-card {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-bottom-width: 5px;
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .option-card:hover {
+            background: #f8fafc;
+        }
+
+        .option-card.selected {
+            border-color: var(--blue);
+            background: #ddf4ff;
+            color: var(--blue-dark);
+        }
+
+        .option-card.correct {
+            border-color: var(--green);
+            background: #d7ffb8;
+            color: var(--green-dark);
+        }
+
+        .option-card.wrong {
+            border-color: var(--red);
+            background: #ffdfe0;
+            color: var(--red-dark);
+        }
+
+        .quiz-bottomBar {
+            border-top: 2px solid var(--border-color);
+            padding: 24px;
+            background: #ffffff;
+        }
+
+        .quiz-bottom-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .feedback-area {
+            flex: 1;
+            font-size: 1rem;
+            line-height: 1.45;
+        }
+
+        .feedback-area.ok { color: #2e6b00; }
+        .feedback-area.err { color: #a31212; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR ESQUERDA -->
+    <aside class="sidebar">
+        <div class="brand">🦉 LogicLingo</div>
+        <nav class="nav-menu">
+            <button id="btn-nav-trail" class="nav-item active" onclick="switchView('trail')">
+                <span>🗺️</span> Aprender (Trilha)
+            </button>
+            <button id="btn-nav-theory" class="nav-item" onclick="switchView('theory')">
+                <span>📘</span> Guia Teórico
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <strong>UNIJORGE</strong><br>
+            Modelagem e Simulação Matemática<br>
+            Prof. Marcelo Lopes • AV3
+        </div>
+    </aside>
+
+    <!-- ÁREA DESKTOP PRINCIPAL -->
+    <div class="desktop-wrapper">
+        
+        <!-- COLUNA CENTRAL -->
+        <main class="center-column">
+            
+            <!-- ABA 1: TRILHA DE DESAFIOS -->
+            <section id="view-trail" class="view-section active">
+                <div class="page-header">
+                    <div>
+                        <h1>Trilha de Lógica e Conjuntos</h1>
+                        <p>Complete as 4 unidades interativas (12 questões) ou estude os conceitos na aba Guia Teórico.</p>
+                    </div>
+                </div>
+
+                <div class="units-grid">
+                    <!-- Unidade 1 -->
+                    <div class="unit-card">
+                        <div>
+                            <div class="unit-top">
+                                <span class="unit-tag" style="background: var(--green);">Unidade 1 • Objetivos 1 e 2</span>
+                                <span id="prog-u0" class="unit-status" style="color: var(--green);">0/3 concluídas</span>
+                            </div>
+                            <h3>Conjuntos, Elementos e Pertinência</h3>
+                            <p>Identifique conjuntos vazio, unitário e infinito, além das relações de pertinência (∈) e contingência/inclusão (⊂).</p>
+                        </div>
+                        <button class="btn-3d btn-green" onclick="openQuiz(0)">Iniciar Unidade 1 (3 Questões)</button>
+                    </div>
+
+                    <!-- Unidade 2 -->
+                    <div class="unit-card">
+                        <div>
+                            <div class="unit-top">
+                                <span class="unit-tag" style="background: var(--blue);">Unidade 2 • Objetivo 2</span>
+                                <span id="prog-u1" class="unit-status" style="color: var(--blue);">0/3 concluídas</span>
+                            </div>
+                            <h3>Operações entre Conjuntos</h3>
+                            <p>Resolva problemas práticos aplicando União (∪), Interseção (∩), Diferença (-) e cálculo de cardinalidade.</p>
+                        </div>
+                        <button class="btn-3d btn-blue" onclick="openQuiz(1)">Iniciar Unidade 2 (3 Questões)</button>
+                    </div>
+
+                    <!-- Unidade 3 -->
+                    <div class="unit-card">
+                        <div>
+                            <div class="unit-top">
+                                <span class="unit-tag" style="background: var(--purple);">Unidade 3 • Objetivo 3</span>
+                                <span id="prog-u2" class="unit-status" style="color: var(--purple);">0/3 concluídas</span>
+                            </div>
+                            <h3>Proposições e Quantificadores</h3>
+                            <p>Diferencie frases comuns de proposições lógicas e aplique os quantificadores Universal (∀) e Existencial (∃).</p>
+                        </div>
+                        <button class="btn-3d btn-purple" onclick="openQuiz(2)">Iniciar Unidade 3 (3 Questões)</button>
+                    </div>
+
+                    <!-- Unidade 4 -->
+                    <div class="unit-card">
+                        <div>
+                            <div class="unit-top">
+                                <span class="unit-tag" style="background: var(--orange);">Unidade 4 • Objetivo 4</span>
+                                <span id="prog-u3" class="unit-status" style="color: var(--orange);">0/3 concluídas</span>
+                            </div>
+                            <h3>Conectivos e Tabelas-Verdade</h3>
+                            <p>Domine os conectivos lógicos, analise tabelas-verdade e reconheça equivalências lógicas e Leis de De Morgan.</p>
+                        </div>
+                        <button class="btn-3d btn-orange" onclick="openQuiz(3)">Iniciar Unidade 4 (3 Questões)</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ABA 2: GUIA TEÓRICO COMPLETO -->
+            <section id="view-theory" class="view-section">
+                <div class="page-header">
+                    <div>
+                        <h1>Guia Teórico Completo</h1>
+                        <p>Material de revisão rápida sobre Teoria dos Conjuntos e Lógica Matemática aplicada à Computação.</p>
+                    </div>
+                </div>
+
+                <div class="theory-grid">
+                    <div class="theory-card full-width">
+                        <h3>Por que Conjuntos e Lógica são essenciais na Computação?</h3>
+                        <p>Cada programa de computador pode ser relacionado a um único <strong>número inteiro</strong> (convertendo seus bits), portanto o conjunto de programas tem a mesma cardinalidade dos números inteiros ($\mathbb{Z}$). Já os <strong>problemas computacionais</strong> relacionam-se ao conjunto dos <strong>números reais ($\mathbb{R}$)</strong>, que possui uma cardinalidade infinitamente maior. Isso prova matematicamente que existem mais problemas do que programas capazes de resolvê-los — como o famoso <strong>Problema da Parada</strong>, onde é impossível criar um algoritmo universal capaz de analisar qualquer outro código e dizer se ele irá parar ou rodar em loop infinito.</p>
+                    </div>
+
+                    <div class="theory-card">
+                        <h3>1. Pertinência, Inclusão e Tipos de Conjunto</h3>
+                        <ul>
+                            <li><strong>Pertinência (<span class="code-pill">∈</span> / <span class="code-pill">∉</span>):</strong> Liga um <em>elemento</em> a um conjunto. Ex: <span class="code-pill">4 ∈ {2, 4, 6}</span>.</li>
+                            <li><strong>Inclusão (<span class="code-pill">⊂</span> / <span class="code-pill">⊆</span>):</strong> Liga um <em>subconjunto</em> a um conjunto maior. Ex: <span class="code-pill">{2, 4} ⊂ {2, 4, 6}</span>.</li>
+                            <li><strong>Conjunto Vazio (<span class="code-pill">∅</span> ou <span class="code-pill">{ }</span>):</strong> Não possui elementos e é subconjunto de qualquer conjunto (<span class="code-pill">∅ ⊂ A</span>).</li>
+                            <li><strong>Conjunto Unitário:</strong> Possui apenas 1 elemento. Ex: Números primos pares = <span class="code-pill">{2}</span>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="theory-card">
+                        <h3>2. Operações entre Conjuntos</h3>
+                        <p>Dados os conjuntos <span class="code-pill">A = {1, 2, 3}</span> e <span class="code-pill">B = {3, 4, 5}</span>:</p>
+                        <ul>
+                            <li><strong>União (<span class="code-pill">A ∪ B</span>):</strong> Todos os elementos juntos: <span class="code-pill">{1, 2, 3, 4, 5}</span>.</li>
+                            <li><strong>Interseção (<span class="code-pill">A ∩ B</span>):</strong> Elementos em comum: <span class="code-pill">{3}</span>.</li>
+                            <li><strong>Diferença (<span class="code-pill">A - B</span>):</strong> Elementos que pertencem somente a A: <span class="code-pill">{1, 2}</span>.</li>
+                            <li><strong>Cardinalidade:</strong> <span class="code-pill">n(A ∪ B) = n(A) + n(B) - n(A ∩ B)</span>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="theory-card">
+                        <h3>3. Proposições vs. Frases e Quantificadores</h3>
+                        <ul>
+                            <li><strong>Proposição Lógica:</strong> Sentença declarativa fechada que pode ser classificada como <strong>Verdadeira (V)</strong> ou <strong>Falsa (F)</strong>.</li>
+                            <li><strong>NÃO são proposições:</strong> Perguntas, ordens/imperativos, exclamações e <strong>sentenças abertas</strong> (como <span class="code-pill">x + 2 = 9</span>, pois <em>x</em> é variável livre).</li>
+                            <li><strong>Quantificador Universal (<span class="code-pill">∀</span>):</strong> "Para todo / Qualquer que seja".</li>
+                            <li><strong>Quantificador Existencial (<span class="code-pill">∃</span>):</strong> "Existe pelo menos um".</li>
+                        </ul>
+                    </div>
+
+                    <div class="theory-card">
+                        <h3>4. Equivalências Lógicas Importantes</h3>
+                        <ul>
+                            <li><strong>Equivalência da Condicional:</strong><br><span class="code-pill">p → q ≡ ~p ∨ q</span> ("Não p OU q").</li>
+                            <li><strong>Contrapositiva da Condicional:</strong><br><span class="code-pill">p → q ≡ ~q → ~p</span>.</li>
+                            <li><strong>1ª Lei de De Morgan (Negação do E):</strong><br><span class="code-pill">~(p ∧ q) ≡ ~p ∨ ~q</span>.</li>
+                            <li><strong>2ª Lei de De Morgan (Negação do OU):</strong><br><span class="code-pill">~(p ∨ q) ≡ ~p ∧ ~q</span>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="theory-card full-width">
+                        <h3>Tabela-Verdade Completa dos Conectivos Lógicos</h3>
+                        <table class="truth-table">
+                            <tr>
+                                <th>p</th>
+                                <th>q</th>
+                                <th>~p (Negação)</th>
+                                <th>p ∧ q (Conjunção - E)</th>
+                                <th>p ∨ q (Disjunção - OU)</th>
+                                <th>p → q (Condicional)</th>
+                                <th>p ↔ q (Bicondicional)</th>
+                            </tr>
+                            <tr><td>V</td><td>V</td><td>F</td><td><strong>V</strong></td><td>V</td><td>V</td><td><strong>V</strong></td></tr>
+                            <tr><td>V</td><td>F</td><td>F</td><td>F</td><td>V</td><td><strong style="color:var(--red);">F</strong></td><td>F</td></tr>
+                            <tr><td>F</td><td>V</td><td>V</td><td>F</td><td>V</td><td>V</td><td>F</td></tr>
+                            <tr><td>F</td><td>F</td><td>V</td><td>F</td><td><strong>F</strong></td><td>V</td><td><strong>V</strong></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- COLUNA LATERAL DIREITA -->
+        <aside class="right-column">
+            <div class="stats-bar">
+                <div class="stat-item" style="color: var(--yellow);">⚡ <span id="xp-val">0</span> XP</div>
+                <div class="stat-item" style="color: var(--red);">❤️ <span id="heart-val">5</span> Vidas</div>
+                <div class="stat-item" style="color: var(--green);">✔ <span id="done-val">0</span>/4</div>
+            </div>
+
+            <div class="widget-box">
+                <h4>Resumo de Símbolos</h4>
+                <ul class="cheat-list">
+                    <li><span>Pertence / Não pertence</span> <span class="code-pill">∈ / ∉</span></li>
+                    <li><span>Está contido (Subconjunto)</span> <span class="code-pill">⊂ / ⊆</span></li>
+                    <li><span>União / Interseção</span> <span class="code-pill">∪ / ∩</span></li>
+                    <li><span>Para todo (Universal)</span> <span class="code-pill">∀</span></li>
+                    <li><span>Existe (Existencial)</span> <span class="code-pill">∃</span></li>
+                    <li><span>Conjunção (E) / Disjunção (OU)</span> <span class="code-pill">∧ / ∨</span></li>
+                    <li><span>Condicional / Bicondicional</span> <span class="code-pill">→ / ↔</span></li>
+                </ul>
+            </div>
+
+            <div class="widget-box">
+                <h4>Objetivos da Avaliação (AV3)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                    1. Raciocínio lógico com conjuntos, proposições e conectivos.<br><br>
+                    2. Tipos de conjuntos, pertinência, contingência e operações.<br><br>
+                    3. Diferença entre frase e proposição; quantificadores ∀ e ∃.<br><br>
+                    4. Tabelas-verdade e equivalências lógicas.
+                </p>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- MODAL DE LIÇÃO EM TELA CHEIA (DESKTOP QUIZ) -->
+    <div id="quiz-modal" class="quiz-modal">
+        <div class="quiz-top">
+            <button class="btn-close" onclick="closeQuiz()" title="Sair da lição">✕</button>
+            <div class="progress-track">
+                <div id="quiz-progress" class="progress-bar-fill"></div>
+            </div>
+            <div class="stat-item" style="color: var(--red); font-weight: 900; font-size: 1.15rem;">
+                ❤️ <span id="modal-hearts">5</span>
+            </div>
+        </div>
+
+        <div class="quiz-center">
+            <div id="q-badge" class="quiz-badge">UNIDADE 1</div>
+            <div id="q-title" class="quiz-title">Pergunta aqui</div>
+            <div id="q-options-grid" class="options-grid"></div>
+        </div>
+
+        <div class="quiz-bottomBar">
+            <div class="quiz-bottom-inner">
+                <div id="q-feedback-text" class="feedback-area">
+                    Selecione uma das alternativas acima e clique em Verificar.
+                </div>
+                <button id="q-submit-btn" class="btn-3d btn-green" style="width: 260px;" onclick="submitOrNext()">
+                    VERIFICAR RESPOSTA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const unitsData = [
+            {
+                title: "Unidade 1: Conjuntos, Elementos e Pertinência",
+                questions: [
+                    {
+                        q: "Questão 1 de 3 • Dados os conjuntos A = {2, 4, 6, 8} e B = {2, 4}, qual alternativa utiliza corretamente as relações de pertinência (∈) e inclusão (⊂)?",
+                        options: [
+                            "4 ⊂ A e B ∈ A",
+                            "4 ∈ A e B ⊂ A",
+                            "6 ∉ A e A ⊂ B",
+                            "B ∉ A e {2} ∈ B"
+                        ],
+                        answer: 1,
+                        explanation: "O símbolo '∈' relaciona elemento a conjunto (4 ∈ A), enquanto '⊂' relaciona subconjunto a conjunto (B ⊂ A)."
+                    },
+                    {
+                        q: "Questão 2 de 3 • Como é classificado o conjunto P = {x ∈ ℕ | x é um número primo e par}?",
+                        options: [
+                            "Conjunto Vazio (∅)",
+                            "Conjunto Infinito",
+                            "Conjunto Unitário, pois P = {2}",
+                            "Conjunto Disjunto"
+                        ],
+                        answer: 2,
+                        explanation: "O único número primo par existente é o 2. Como P = {2} possui apenas um elemento, ele é um Conjunto Unitário."
+                    },
+                    {
+                        q: "Questão 3 de 3 • Sobre o conjunto vazio (∅) e um conjunto qualquer A = {1, 2}, qual afirmação é sempre VERDADEIRA?",
+                        options: [
+                            "O conjunto vazio está contido em qualquer conjunto (∅ ⊂ A)",
+                            "O conjunto vazio nunca é subconjunto de A",
+                            "A interseção de A com ∅ resulta no próprio conjunto A",
+                            "O conjunto {0} representa um conjunto vazio"
+                        ],
+                        answer: 0,
+                        explanation: "Na Teoria dos Conjuntos, o conjunto vazio é subconjunto de qualquer conjunto (∅ ⊂ A). Além disso, {0} é unitário, não vazio."
+                    }
+                ]
+            },
+            {
+                title: "Unidade 2: Operações entre Conjuntos",
+                questions: [
+                    {
+                        q: "Questão 1 de 3 • Sabendo que A = {1, 2, 3, 4} e B = {3, 4, 5, 6}, qual é o conjunto resultante da operação de Diferença (A - B)?",
+                        options: [
+                            "{3, 4}",
+                            "{1, 2, 3, 4, 5, 6}",
+                            "{1, 2}",
+                            "{5, 6}"
+                        ],
+                        answer: 2,
+                        explanation: "A diferença (A - B) contém apenas os elementos exclusivos de A que não aparecem em B: {1, 2}."
+                    },
+                    {
+                        q: "Questão 2 de 3 • Considere A = {1, 2, 3}, B = {3, 4, 5} e C = {2, 4}. Qual é o resultado da operação composta (A ∪ B) - C?",
+                        options: [
+                            "{1, 3, 5}",
+                            "{2, 4}",
+                            "{3}",
+                            "{1, 2, 3, 4, 5}"
+                        ],
+                        answer: 0,
+                        explanation: "A união (A ∪ B) resulta em {1, 2, 3, 4, 5}. Subtraindo os elementos de C ({2, 4}), restam {1, 3, 5}."
+                    },
+                    {
+                        q: "Questão 3 de 3 • Em uma equipe de desenvolvedores, 20 programam em Python (P), 15 em Java (J) e 5 programam em ambas (P ∩ J). Quantos programam em pelo menos uma dessas linguagens (P ∪ J)?",
+                        options: [
+                            "35 desenvolvedores",
+                            "30 desenvolvedores",
+                            "25 desenvolvedores",
+                            "40 desenvolvedores"
+                        ],
+                        answer: 1,
+                        explanation: "Pelo princípio da inclusão-exclusão: n(P ∪ J) = n(P) + n(J) - n(P ∩ J) = 20 + 15 - 5 = 30."
+                    }
+                ]
+            },
+            {
+                title: "Unidade 3: Proposições e Quantificadores",
+                questions: [
+                    {
+                        q: "Questão 1 de 3 • Uma proposição lógica deve ser uma sentença declarativa fechada que pode ser valorada como Verdadeira (V) ou Falsa (F). Qual opção abaixo É uma proposição?",
+                        options: [
+                            "\"Faça o backup do banco de dados agora!\"",
+                            "\"Quantos elementos existem neste conjunto?\"",
+                            "\"O número 7 é ímpar e 10 é divisível por 2.\"",
+                            "\"x + 8 = 15\""
+                        ],
+                        answer: 2,
+                        explanation: "Frases imperativas, interrogativas e sentenças abertas (com variável livre 'x') não possuem valor V/F. Apenas a frase declarativa sobre 7 e 10 é proposição."
+                    },
+                    {
+                        q: "Questão 2 de 3 • A expressão \"x + 4 > 10\" é uma sentença aberta. Como podemos transformá-la em uma proposição lógica fechada?",
+                        options: [
+                            "Adicionando um ponto de interrogação ao final.",
+                            "Empregando um quantificador (∀ ou ∃) junto ao conjunto universo de x.",
+                            "Substituindo o sinal '>' por '='.",
+                            "Sentenças abertas nunca podem virar proposições."
+                        ],
+                        answer: 1,
+                        explanation: "O uso dos quantificadores Universal (∀) ou Existencial (∃) vincula a variável livre, transformando a sentença aberta em proposição lógica."
+                    },
+                    {
+                        q: "Questão 3 de 3 • Dado o conjunto finito A = {2, 4, 6}, qual das proposições quantificadas abaixo possui valor lógico VERDADEIRO?",
+                        options: [
+                            "∀x ∈ A, x > 5 (Para todo x em A, x é maior que 5)",
+                            "∃x ∈ A, x é ímpar (Existe x em A tal que x é ímpar)",
+                            "∃x ∈ A, x > 5 (Existe pelo menos um x em A maior que 5)",
+                            "∀x ∈ A, x = 2 (Para todo x em A, x é igual a 2)"
+                        ],
+                        answer: 2,
+                        explanation: "O quantificador existencial (∃) requer que ao menos um elemento satisfaça a condição. Como 6 ∈ A e 6 > 5, a sentença é Verdadeira."
+                    }
+                ]
+            },
+            {
+                title: "Unidade 4: Conectivos e Tabelas-Verdade",
+                questions: [
+                    {
+                        q: "Questão 1 de 3 • Na tabela-verdade da proposição condicional (p → q), lida como \"Se p, então q\", em qual ÚNICO caso o resultado é FALSO (F)?",
+                        options: [
+                            "Quando p é Falso e q é Falso.",
+                            "Quando p é Verdadeiro e q é Falso (V → F).",
+                            "Quando p é Falso e q é Verdadeiro.",
+                            "Quando ambos possuem valores lógicos iguais."
+                        ],
+                        answer: 1,
+                        explanation: "A condicional (p → q) só é Falsa quando a condição suficiente ocorre (p = V) e a conclusão falha (q = F)."
+                    },
+                    {
+                        q: "Questão 2 de 3 • Segundo as Leis de De Morgan, qual é a negação lógica equivalente da conjunção ~(p ∧ q)?",
+                        options: [
+                            "~p ∧ ~q",
+                            "p ∨ q",
+                            "~p ∨ ~q",
+                            "~p → ~q"
+                        ],
+                        answer: 2,
+                        explanation: "Para negar uma conjunção ('E'), negamos ambas as proposições simples e trocamos o conectivo '∧' por '∨' ('OU'): ~p ∨ ~q."
+                    },
+                    {
+                        q: "Questão 3 de 3 • Considere a proposição condicional: \"Se o código compila (p), então o programa executa (q)\" (p → q). Qual alternativa apresenta sua Equivalência Lógica?",
+                        options: [
+                            "O código NÃO compila OU o programa executa (~p ∨ q)",
+                            "O código compila E o programa NÃO executa (p ∧ ~q)",
+                            "Se o programa executa, então o código compila (q → p)",
+                            "O código não compila E o programa não executa (~p ∧ ~q)"
+                        ],
+                        answer: 0,
+                        explanation: "A equivalência clássica da condicional na tabela-verdade é dada pela disjunção com o antecedente negado: (p → q) ≡ (~p ∨ q)."
+                    }
+                ]
+            }
+        ];
+
+        let xp = 0;
+        let hearts = 5;
+        let completed = [false, false, false, false];
+
+        let activeUnit = 0;
+        let activeQ = 0;
+        let selectedOpt = null;
+        let stepState = "SELECT";
+
+        function switchView(view) {
+            document.getElementById('view-trail').classList.toggle('active', view === 'trail');
+            document.getElementById('view-theory').classList.toggle('active', view === 'theory');
+            document.getElementById('btn-nav-trail').classList.toggle('active', view === 'trail');
+            document.getElementById('btn-nav-theory').classList.toggle('active', view === 'theory');
+        }
+
+        function openQuiz(unitIdx) {
+            if (hearts <= 0) {
+                hearts = 5;
+                refreshStats();
+            }
+            activeUnit = unitIdx;
+            activeQ = 0;
+            document.getElementById('quiz-modal').classList.add('active');
+            renderQuestion();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quiz-modal').classList.remove('active');
+        }
+
+        function renderQuestion() {
+            stepState = "SELECT";
+            selectedOpt = null;
+
+            const u = unitsData[activeUnit];
+            const q = u.questions[activeQ];
+
+            document.getElementById('q-badge').innerText = u.title;
+            document.getElementById('q-title').innerText = q.q;
+            document.getElementById('quiz-progress').style.width = `${(activeQ / u.questions.length) * 100}%`;
+
+            const fb = document.getElementById('q-feedback-text');
+            fb.className = 'feedback-area';
+            fb.innerHTML = 'Selecione uma das alternativas acima e clique em Verificar.';
+
+            const btn = document.getElementById('q-submit-btn');
+            btn.innerText = 'VERIFICAR RESPOSTA';
+            btn.className = 'btn-3d btn-green';
+
+            const grid = document.getElementById('q-options-grid');
+            grid.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const button = document.createElement('button');
+                button.className = 'option-card';
+                button.innerText = opt;
+                button.onclick = () => chooseOption(idx);
+                grid.appendChild(button);
+            });
+        }
+
+        function chooseOption(idx) {
+            if (stepState !== "SELECT") return;
+            selectedOpt = idx;
+            document.querySelectorAll('.option-card').forEach((card, i) => {
+                card.classList.toggle('selected', i === idx);
+            });
+        }
+
+        function submitOrNext() {
+            const u = unitsData[activeUnit];
+            const q = u.questions[activeQ];
+            const fb = document.getElementById('q-feedback-text');
+            const btn = document.getElementById('q-submit-btn');
+            const cards = document.querySelectorAll('.option-card');
+
+            if (stepState === "SELECT") {
+                if (selectedOpt === null) return;
+                stepState = "FEEDBACK";
+
+                const right = (selectedOpt === q.answer);
+                cards.forEach((card, i) => {
+                    if (i === q.answer) card.classList.add('correct');
+                    else if (i === selectedOpt && !right) card.classList.add('wrong');
+                });
+
+                if (right) {
+                    xp += 20;
+                    fb.className = 'feedback-area ok';
+                    fb.innerHTML = `<strong>✔ Resposta Correta (+20 XP)!</strong> ${q.explanation}`;
+                    btn.innerText = 'PRÓXIMA QUESTÃO';
+                    btn.className = 'btn-3d btn-green';
+                } else {
+                    hearts = Math.max(0, hearts - 1);
+                    fb.className = 'feedback-area err';
+                    fb.innerHTML = `<strong>✖ Resposta Incorreta (-1 Vida):</strong> ${q.explanation}`;
+                    btn.innerText = 'CONTINUAR';
+                    btn.className = 'btn-3d btn-blue';
+                }
+                refreshStats();
+            } else {
+                activeQ++;
+                if (activeQ < u.questions.length) {
+                    renderQuestion();
+                } else {
+                    document.getElementById('quiz-progress').style.width = '100%';
+                    completed[activeUnit] = true;
+                    document.getElementById(`prog-u${activeUnit}`).innerText = '3/3 concluídas ✔';
+                    refreshStats();
+                    setTimeout(closeQuiz, 300);
+                }
+            }
+        }
+
+        function refreshStats() {
+            document.getElementById('xp-val').innerText = xp;
+            document.getElementById('heart-val').innerText = hearts;
+            document.getElementById('modal-hearts').innerText = hearts;
+            const totalDone = completed.filter(Boolean).length;
+            document.getElementById('done-val').innerText = totalDone;
+        }
+    </script>
+</body>
+</html>
